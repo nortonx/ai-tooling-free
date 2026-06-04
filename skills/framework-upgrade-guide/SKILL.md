@@ -1,6 +1,6 @@
 ---
 name: framework-upgrade-guide
-description: "Analyze a TypeScript/Node project (Angular, React, Vue, or Svelte), read its dependencies, flag deprecated/EOL packages and known vulnerabilities, and produce a careful stepwise major-by-major upgrade guide (e.g. Angular 15→16→17→18→19) written to a file. Use this whenever the user wants to upgrade, migrate, or modernize a front-end framework, bump major versions, plan a dependency migration, check what's deprecated, or asks how to get from their current framework version to the latest — even if they don't say the word 'upgrade'. Args: [<path-to-repo-or-package.json>]"
+description: "Analyze a TypeScript/Node project (Angular, React, or Vue), read its dependencies, flag deprecated/EOL packages and known vulnerabilities, and produce a careful stepwise major-by-major upgrade guide (e.g. Angular 15→16→17→18→19) written to a file. Use this whenever the user wants to upgrade, migrate, or modernize a front-end framework, bump major versions, plan a dependency migration, check what's deprecated, or asks how to get from their current framework version to the latest — even if they don't say the word 'upgrade'. Args: [<path-to-repo-or-package.json>]"
 argument-hint: "[<path-to-repo-or-package.json>]"
 ---
 
@@ -40,15 +40,21 @@ the project may be on someone else's machine and may not have `node_modules`):
 - `package.json` — `dependencies`, `devDependencies`, `engines`, `packageManager`.
 - The lockfile (`package-lock.json`, `yarn.lock`, or `pnpm-lock.yaml`) — this has the **exact resolved
   versions**, which `package.json` ranges (`^`, `~`) do not. The resolved version is what you reason about.
-- Framework config: `angular.json`, `vite.config.*`, `vue.config.*`, `svelte.config.js`,
-  `next.config.*`, `nuxt.config.*` — these disambiguate the framework and toolchain.
+  **If no lockfile exists**, say so prominently in the guide header — analysis falls back to `package.json`
+  ranges, which may over- or under-state the installed versions. Ask the user to share the lockfile or
+  paste the output of a read-only `npm ls --depth=0`.
+- Framework config: `angular.json`, `vite.config.*`, `vue.config.*`,
+  `next.config.*`, `nuxt.config.*`, `remix.config.*` (or `vite.config.*` importing `@remix-run/*`
+  plugins) — these disambiguate the framework and toolchain.
 - `tsconfig.json` (current TypeScript target/strictness), `.nvmrc` / `.node-version` (runtime).
 
 From this, fix three facts: **framework**, **current major version**, and **toolchain** (CLI vs Vite vs
-CRA vs Nuxt/Next/SvelteKit). Then read the matching `references/<framework>.md` — it holds the
+CRA vs Nuxt/Next). Then read the matching `references/<framework>.md` — it holds the
 per-hop breaking changes, lockstep matrix, and codemods you'll need.
 
-If the project isn't one of Angular/React/Vue/Svelte, say so and offer a generic dependency-bump plan
+If the framework cannot be determined unambiguously from these signals (e.g. both `react` and `vue`
+present), surface the candidates in the Clarify step and ask which is the primary framework — do not
+guess. If the project isn't one of Angular/React/Vue, say so and offer a generic dependency-bump plan
 instead of forcing a framework template onto it.
 
 ### 2. Research the current truth
@@ -56,10 +62,13 @@ instead of forcing a framework template onto it.
 Your training data lags real releases. Before committing to a target version or listing breaking
 changes, confirm against live sources:
 
-- **context7** — `resolve-library-id` then `query-docs` for the framework's official upgrade/migration
-  docs and the per-major changelog.
-- **WebSearch / WebFetch** — the official update guide (e.g. `update.angular.dev`, the React, Vue, and
-  Svelte upgrade guides) for the **current latest stable major** and the breaking changes per hop.
+- **context7**, if available — `resolve-library-id` then `query-docs` for the framework's official
+  upgrade/migration docs and the per-major changelog.
+- **WebSearch / WebFetch** — the official update guide (e.g. `update.angular.dev`, the React and Vue
+  upgrade guides) for the **current latest stable major** and the breaking changes per hop.
+
+At least one live-source lookup is required — never rely on training data alone for version numbers or
+breaking-change lists.
 
 Confirm the latest stable major specifically — don't assume the number in your training data is current.
 
@@ -73,14 +82,18 @@ read from files:
 - Risk tolerance and time budget — big-bang over a weekend, or incremental over sprints?
 - Test coverage and CI: is there a suite that can verify each hop? (No tests changes the verification advice.)
 - Monorepo / workspaces? (affects how `ng update`, codemods, and version pinning are applied)
-- SSR / SSG in use (Angular Universal/hydration, Next, Nuxt, SvelteKit adapters)?
+- SSR / SSG in use (Angular Universal/hydration, Next, Nuxt)?
 - Third-party UI / component libraries (Angular Material/CDK, PrimeNG, MUI, Vuetify, Tailwind plugins…) —
   these often **gate the pace**: you can't outrun the slowest core-coupled library.
 - Node runtime constraints (a fixed Node version in prod can block a target major).
 - Custom or ejected build (custom webpack, ejected CRA) — automated migrations may not apply cleanly.
 - Must the app stay shippable in prod throughout? (favors smaller, independently-releasable hops)
 
-Wait for the answers before producing the guide.
+**Blocking** (don't write the guide without answers): target version, monorepo/workspaces, the
+third-party UI/component library list. **Non-blocking** (state your assumption in the guide if
+unanswered): risk tolerance, SSR, test coverage, Node constraints, custom build, prod-shippability.
+
+Wait for the blocking answers before producing the guide.
 
 ### 4. Assess current state
 
@@ -101,12 +114,18 @@ user runs themselves — read-only, optional, not something you require to produ
 ### 5. Compute the upgrade path
 
 Build the hop sequence from current major to target. **One major per hop wherever the framework requires
-sequential upgrades** (mandatory for Angular; for React/Vue/Svelte, split when a codemod or breaking
-change makes a direct jump unsafe — the reference file says when).
+sequential upgrades.** Mandatory for Angular (`ng update` refuses multi-major jumps). For React, split
+at any intermediate major that ships official codemods or deprecation removals (currently 18 and 19) —
+running a later major's codemods on earlier source can mis-transform. For Vue 2→3, the migration-build
+phases (install `@vue/compat` → fix warnings → remove compat) are the hops.
+
+Assign each hop a Low/Medium/High risk rating based on: breaking changes needing manual edits,
+third-party ecosystem blockers, and how much automated migration covers — this feeds the path
+overview table.
 
 For **each hop**, document:
 
-- The official command (`ng update @angular/core@N @angular/cli@N`, `npx svelte-migrate`, React codemods, etc.).
+- The official command (`ng update @angular/core@N @angular/cli@N`, React codemods, Vue migration build, etc.).
 - The **lockstep core packages** that must move together, with the version each lands on (a small matrix).
 - Breaking changes and the concrete code edits they require.
 - Available automated migrations / codemods (and `--dry-run` to preview where supported).
@@ -162,8 +181,8 @@ Use this exact structure so every guide this skill produces is consistent and sc
 - [ ] ...
 
 ## Rollback
-<how to revert a hop: branch, lockfile, etc.>
-
-## Glossary (essentials)
-<include only if the document uses 5+ technical acronyms>
+<must specify: (1) the branch/tag to restore, (2) the lockfile restore command
+(`git checkout HEAD -- <lockfile>`), (3) clear and reinstall node_modules after a lockfile revert,
+(4) note that migration schematics/codemods rewrite source — reverting the lockfile alone is not
+enough; check out the hop's starting commit to restore source too>
 ```

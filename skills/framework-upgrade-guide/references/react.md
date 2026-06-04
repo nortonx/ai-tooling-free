@@ -30,12 +30,13 @@ run on intermediate code (running v19 codemods on v17 source can miss or mis-tra
 React ships official codemods. Run them per target major:
 
 ```
-npx codemod react/19/migration-recipe      # React 19 recipe (the current tooling)
+npx codemod@latest react/19/migration-recipe   # React 19 recipe (the current tooling)
 # legacy: npx react-codemod <transform> <path>
 ```
 
 Confirm the current codemod entry point against the official upgrade guide (the tooling moved from
-`react-codemod` to the `codemod` runner). `--dry` previews where supported.
+`react-codemod` to the `codemod` runner). `--dry-run` previews changes without applying them (the
+legacy `react-codemod` uses `--dry`).
 
 ## Breaking-change themes by major
 
@@ -47,7 +48,10 @@ Confirm specifics against the official "Upgrading to React N" guide:
   `@types/react` v18 drops implicit `children`.
 - **19** — Actions / `useActionState` / `useFormStatus`; `use()` API; **ref as a regular prop** (the
   `forwardRef` ceremony is going away); the React Compiler (opt-in); removal of long-deprecated APIs
-  (`propTypes`/`defaultProps` on function components, legacy context, `ReactDOM.render`, string refs).
+  (`propTypes`/`defaultProps` on function components, legacy context, `ReactDOM.render`, string refs);
+  the modern (automatic) **JSX transform is now required** — ref-as-prop and JSX perf improvements
+  depend on it; apps on the legacy transform emit a warning and must switch (`jsx: react-jsx` in TS,
+  or the bundler equivalent).
 
 ## CRA → Vite migration (do it as part of the upgrade if on `react-scripts`)
 
@@ -67,7 +71,8 @@ npx tsc --noEmit     # TS projects: catches the @types/react breakages
 ```
 
 The TypeScript check is the highest-signal step for React major bumps — most v18/v19 breakage shows up
-as type errors first.
+as type errors first. For meta-framework projects, substitute the framework's own commands
+(`next build` / `next dev`, `remix build` / `remix dev`); the `tsc --noEmit` check applies to all.
 
 ## Gotchas
 

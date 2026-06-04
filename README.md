@@ -52,7 +52,7 @@ Doesn't:
 |---|---|
 | `fanout-review` | Multi-perspective code review: 6 parallel reviewers + deterministic merge gate, output ready to paste into a PR thread |
 | `check-dx` | Audit your eslint / prettier / biome rules and rank keep / tune / drop via consensus across 5 independent evaluation passes |
-| `framework-upgrade-guide` | Stepwise major-by-major upgrade guide for Angular / React / Vue / Svelte projects, with lockstep version matrices and per-hop verification |
+| `framework-upgrade-guide` | Stepwise major-by-major upgrade guide for Angular / React / Vue projects, with lockstep version matrices and per-hop verification |
 | `check-dry` | Detect DRY violations and recommend refactoring strategies |
 | `check-tests` | Check test coverage for the changes on the current branch |
 | `create-commit-message` | Ready-to-paste conventional commit message from your current changes |
