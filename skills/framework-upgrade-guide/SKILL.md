@@ -1,0 +1,169 @@
+---
+name: framework-upgrade-guide
+description: "Analyze a TypeScript/Node project (Angular, React, Vue, or Svelte), read its dependencies, flag deprecated/EOL packages and known vulnerabilities, and produce a careful stepwise major-by-major upgrade guide (e.g. Angular 15→16→17→18→19) written to a file. Use this whenever the user wants to upgrade, migrate, or modernize a front-end framework, bump major versions, plan a dependency migration, check what's deprecated, or asks how to get from their current framework version to the latest — even if they don't say the word 'upgrade'. Args: [<path-to-repo-or-package.json>]"
+argument-hint: "[<path-to-repo-or-package.json>]"
+---
+
+<!-- Note: $ARGUMENTS is substituted by Claude commands only. In Copilot,
+     the user must include their argument inline in the prompt; the skill
+     body sees the literal text "$ARGUMENTS" unsubstituted. -->
+
+## Arguments
+
+`[<path-to-repo-or-package.json>]`
+
+- Optional. Path to the target project root or its `package.json`. If omitted, use the current
+  working directory.
+- **Examples**: `/framework-upgrade-guide`, `/framework-upgrade-guide ./apps/web`, `/framework-upgrade-guide ../client/package.json`
+
+> Copilot CLI note: `$ARGUMENTS` doesn't substitute in skills — include the argument inline in your prompt.
+
+# Framework upgrade guide
+
+Analyze a JavaScript/TypeScript front-end project, determine where it stands relative to the latest
+stable release of its framework, and write a **stepwise, minimum-impact upgrade guide** to a file in
+the repo. The guide must walk the project up **one major at a time** wherever the framework requires
+it (Angular always; the others when codemods or breaking changes make a single jump unsafe), so the
+person executing it never has to reverse-engineer the order or guess which packages move together.
+
+The whole point is to remove risk and guesswork from a major upgrade. A guide that lists "upgrade to
+the latest" without the intermediate hops, the lockstep version matrix, and the breaking changes per
+hop is worse than useless — it gives false confidence. Be specific and be honest about what will break.
+
+## Workflow
+
+### 1. Detect — read only, never install
+
+Read these from the target path (don't run `npm install`, builds, or anything that mutates state —
+the project may be on someone else's machine and may not have `node_modules`):
+
+- `package.json` — `dependencies`, `devDependencies`, `engines`, `packageManager`.
+- The lockfile (`package-lock.json`, `yarn.lock`, or `pnpm-lock.yaml`) — this has the **exact resolved
+  versions**, which `package.json` ranges (`^`, `~`) do not. The resolved version is what you reason about.
+- Framework config: `angular.json`, `vite.config.*`, `vue.config.*`, `svelte.config.js`,
+  `next.config.*`, `nuxt.config.*` — these disambiguate the framework and toolchain.
+- `tsconfig.json` (current TypeScript target/strictness), `.nvmrc` / `.node-version` (runtime).
+
+From this, fix three facts: **framework**, **current major version**, and **toolchain** (CLI vs Vite vs
+CRA vs Nuxt/Next/SvelteKit). Then read the matching `references/<framework>.md` — it holds the
+per-hop breaking changes, lockstep matrix, and codemods you'll need.
+
+If the project isn't one of Angular/React/Vue/Svelte, say so and offer a generic dependency-bump plan
+instead of forcing a framework template onto it.
+
+### 2. Research the current truth
+
+Your training data lags real releases. Before committing to a target version or listing breaking
+changes, confirm against live sources:
+
+- **context7** — `resolve-library-id` then `query-docs` for the framework's official upgrade/migration
+  docs and the per-major changelog.
+- **WebSearch / WebFetch** — the official update guide (e.g. `update.angular.dev`, the React, Vue, and
+  Svelte upgrade guides) for the **current latest stable major** and the breaking changes per hop.
+
+Confirm the latest stable major specifically — don't assume the number in your training data is current.
+
+### 3. Clarify — ask probing questions and wait
+
+Before writing anything, show the detected state (framework, current → latest, toolchain) and
+ask the questions that change the plan. Don't skip this — the right path depends on answers you can't
+read from files:
+
+- Target version: latest stable, or pin to a specific major (e.g. an LTS the team standardizes on)?
+- Risk tolerance and time budget — big-bang over a weekend, or incremental over sprints?
+- Test coverage and CI: is there a suite that can verify each hop? (No tests changes the verification advice.)
+- Monorepo / workspaces? (affects how `ng update`, codemods, and version pinning are applied)
+- SSR / SSG in use (Angular Universal/hydration, Next, Nuxt, SvelteKit adapters)?
+- Third-party UI / component libraries (Angular Material/CDK, PrimeNG, MUI, Vuetify, Tailwind plugins…) —
+  these often **gate the pace**: you can't outrun the slowest core-coupled library.
+- Node runtime constraints (a fixed Node version in prod can block a target major).
+- Custom or ejected build (custom webpack, ejected CRA) — automated migrations may not apply cleanly.
+- Must the app stay shippable in prod throughout? (favors smaller, independently-releasable hops)
+
+Wait for the answers before producing the guide.
+
+### 4. Assess current state
+
+Classify every dependency into **core** (the framework and its first-party companions — see the
+reference file for the exact list per framework) and **ecosystem** (everything else). The guide focuses
+on core; ecosystem packages are handled in the risk table (step 6).
+
+Flag:
+- Majors that are **EOL / unsupported** (no security patches) — these raise urgency.
+- **Deprecated** packages and APIs you can see in use.
+- **Peer-dependency conflicts** that already exist or that the target will introduce.
+
+**Security**: map the resolved lockfile versions to known advisories using your research (context7 /
+WebSearch against the advisory databases). Note which vulnerabilities the upgrade resolves and which
+need a separate bump. Recommend `npm audit` (or `pnpm audit` / `yarn audit`) as a verification step the
+user runs themselves — read-only, optional, not something you require to produce the guide.
+
+### 5. Compute the upgrade path
+
+Build the hop sequence from current major to target. **One major per hop wherever the framework requires
+sequential upgrades** (mandatory for Angular; for React/Vue/Svelte, split when a codemod or breaking
+change makes a direct jump unsafe — the reference file says when).
+
+For **each hop**, document:
+
+- The official command (`ng update @angular/core@N @angular/cli@N`, `npx svelte-migrate`, React codemods, etc.).
+- The **lockstep core packages** that must move together, with the version each lands on (a small matrix).
+- Breaking changes and the concrete code edits they require.
+- Available automated migrations / codemods (and `--dry-run` to preview where supported).
+- Minimum **TypeScript / Node** and other floor versions (RxJS, zone.js, etc. per framework).
+- **Per-hop verification**: build, test, and a smoke check, so a hop is proven before the next starts.
+
+### 6. Ecosystem risk table
+
+List the non-core packages most likely to break, with the **evidence** (the peer-dependency range that
+won't be satisfied at the target) and the version that does support the target — or "no compatible
+release yet", which is itself a blocking finding the user needs up front.
+
+### 7. Write the guide
+
+Write to `docs/upgrades/<framework>-<from>-to-<to>.md` in the target repo (create the directory if
+needed), using the template below.
+
+## Output template
+
+Use this exact structure so every guide this skill produces is consistent and scannable:
+
+```markdown
+# Upgrade guide: <Framework> <from> → <to>
+
+## Summary
+<2–4 sentences: current state, target, number of hops, main risks.>
+
+## Prerequisites
+- Node, TypeScript, package manager (minimum versions)
+- Dedicated branch / backup; test suite green before starting
+
+## Path overview
+| Hop | From | To | Main command | Risk |
+|---|---|---|---|---|
+
+## Step N: <X> → <Y>
+- **Command**: ...
+- **Lockstep packages**: table (package → target version)
+- **Breaking changes**: ...
+- **Codemods / automated migrations**: ...
+- **Manual edits**: ...
+- **Verification**: build / tests / smoke
+<repeat per hop>
+
+## Security
+<vulnerabilities found, which the upgrade resolves, which need a separate bump>
+
+## Ecosystem packages at risk
+| Package | Current version | Peer constraint | Version compatible with the target |
+|---|---|---|---|
+
+## Final checklist
+- [ ] ...
+
+## Rollback
+<how to revert a hop: branch, lockfile, etc.>
+
+## Glossary (essentials)
+<include only if the document uses 5+ technical acronyms>
+```
