@@ -1,8 +1,9 @@
 # ai-tooling-free setup — Windows (PowerShell 5.1+ or pwsh 7+)
 #
 # Creates directory junctions for each skill into ~\.claude\skills,
-# ~\.copilot\skills and ~\.gemini\skills, and copies each agent into
-# ~\.claude\agents. Junctions need no admin rights or Developer Mode.
+# ~\.copilot\skills, ~\.gemini\skills and ~\.agents\skills (the Agent
+# Skills open-standard dir — Codex CLI, Cursor, etc.), and copies each
+# agent into ~\.claude\agents. Junctions need no admin rights or Developer Mode.
 # Anything already at a destination is backed up to <name>.bak first.
 # It never reads or writes settings.json, models, themes, or global
 # instruction files. Re-running is safe (idempotent).
@@ -45,10 +46,11 @@ function Copy-File($Src, $Dst) {
     Info "Copied $Dst"
 }
 
-# Skills -> all three CLIs
+# Skills -> the three CLIs plus the Agent Skills standard dir (~\.agents\skills)
 foreach ($target in @("$env:USERPROFILE\.claude\skills",
                       "$env:USERPROFILE\.copilot\skills",
-                      "$env:USERPROFILE\.gemini\skills")) {
+                      "$env:USERPROFILE\.gemini\skills",
+                      "$env:USERPROFILE\.agents\skills")) {
     New-Item -ItemType Directory -Force -Path $target | Out-Null
     Get-ChildItem -Directory "$Repo\skills" | ForEach-Object {
         Link-Dir $_.FullName (Join-Path $target $_.Name)

@@ -1,12 +1,12 @@
 # ai-tooling-free
 
-Curated, cross-platform AI coding **skills** and **agents** for [Claude Code](https://claude.com/claude-code), [GitHub Copilot CLI](https://github.com/github/copilot-cli), and Gemini CLI / Antigravity — one source of truth, symlinked into all three.
+Curated, cross-platform AI coding **skills** and **agents** for [Claude Code](https://claude.com/claude-code), [GitHub Copilot CLI](https://github.com/github/copilot-cli), Gemini CLI / Antigravity, and any [Agent Skills](https://agentskills.io) standard adopter (OpenAI Codex CLI, Cursor, Amp, OpenCode, …) — one source of truth, symlinked into all of them.
 
 16 skills, 10 agents, a dependency-light setup script. No npm install, no postinstall magic, no settings rewriting.
 
 ## Requirements
 
-- One or more of: Claude Code, GitHub Copilot CLI, Gemini CLI / Antigravity
+- One or more of: Claude Code, GitHub Copilot CLI, Gemini CLI / Antigravity, or any [Agent Skills](https://agentskills.io) adopter (OpenAI Codex CLI, Cursor, …)
 - `git` (recommended — several skills are git-centric)
 - Keep the cloned repo where it is: skills are **symlinked**, not copied. If you move the clone, re-run setup.
 
@@ -34,7 +34,7 @@ Windows uses directory junctions (`mklink /J`) — **no admin rights or Develope
 
 Does:
 
-- Symlinks each skill into `~/.claude/skills`, `~/.copilot/skills`, and `~/.gemini/skills`
+- Symlinks each skill into `~/.claude/skills`, `~/.copilot/skills`, `~/.gemini/skills`, and `~/.agents/skills` — the last is the canonical user dir of the [Agent Skills open standard](https://agentskills.io), so one link target covers Codex CLI, Cursor, and every other adopter
 - Links each agent into `~/.claude/agents` (Claude Code only; copied on Windows)
 - Backs up anything already at a destination to `<name>.bak` before linking
 - Is idempotent — re-run it any time
@@ -67,7 +67,15 @@ Doesn't:
 | `smart-fix` | Route an issue description to the right flow: bug, performance, security, or feature |
 | `update-claude-md` | Update a project's CLAUDE.md with conventions learned from recent changes |
 
-Skills work in Claude Code, Copilot CLI, and Gemini CLI (same `SKILL.md` format). Note: Copilot CLI doesn't substitute `$ARGUMENTS` — pass arguments inline in your prompt; each skill documents this.
+Skills work in Claude Code, Copilot CLI, Gemini CLI, and Agent Skills adopters like Codex CLI and Cursor (same `SKILL.md` format).
+
+### Cross-tool caveats
+
+- **`$ARGUMENTS` only substitutes in Claude Code** — every other tool's skill body sees the literal text. Pass arguments inline in your prompt; each skill documents this in its `## Arguments` section.
+- **Skill bodies use Claude Code tool names** (Read, Edit, Grep, Agent, …). Other tools map them to their own equivalents loosely — most skills work fine, but agent-dispatch steps are Claude-only.
+- **Codex CLI**: list skills with `/skills` or `$`-mention; disable individual skills via `~/.codex/config.toml`. This repo does **not** create `~/.codex/AGENTS.md` or any global instructions.
+- **Cursor** also scans the legacy `~/.claude/skills` location, so it may discover the same skill via two paths — both resolve to the same target, harmless.
+- **Skill discovery in Codex/Cursor hasn't been smoke-tested by this setup** — the links follow the documented Agent Skills locations; verify with `/skills` (Codex) or the Agent skill list (Cursor) after install.
 
 ## Agents (Claude Code only)
 
@@ -79,14 +87,14 @@ Setup only creates links (plus `.bak` backups) — nothing of yours is deleted. 
 
 ```bash
 # remove the skill symlinks this repo created
-for d in ~/.claude/skills ~/.copilot/skills ~/.gemini/skills; do
+for d in ~/.claude/skills ~/.copilot/skills ~/.gemini/skills ~/.agents/skills; do
   find "$d" -maxdepth 1 -type l -lname "*/ai-tooling-free/*" -delete
 done
 # remove the agent links
 find ~/.claude/agents -maxdepth 1 -type l -lname "*/ai-tooling-free/*" -delete
 ```
 
-On Windows, delete the junctions under `%USERPROFILE%\.claude\skills` (and `.copilot`, `.gemini`) — `rmdir <name>` removes a junction without touching this repo. Restore any `.bak` files you want back.
+On Windows, delete the junctions under `%USERPROFILE%\.claude\skills` (and `.copilot`, `.gemini`, `.agents`) — `rmdir <name>` removes a junction without touching this repo. Restore any `.bak` files you want back.
 
 ## License
 

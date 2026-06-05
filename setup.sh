@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # ai-tooling-free setup — macOS / Linux / WSL2
 #
-# Symlinks each skill into ~/.claude/skills, ~/.copilot/skills and
-# ~/.gemini/skills, and each agent into ~/.claude/agents.
+# Symlinks each skill into ~/.claude/skills, ~/.copilot/skills,
+# ~/.gemini/skills and ~/.agents/skills (the Agent Skills open-standard
+# dir — Codex CLI, Cursor, etc.), and each agent into ~/.claude/agents.
 # Anything already at a destination is backed up to <name>.bak first.
 # It never reads or writes settings.json, models, themes, or global
 # instruction files. Re-running is safe (idempotent).
@@ -42,8 +43,8 @@ link() {
   info "Linked $dst -> $src"
 }
 
-# Skills → all three CLIs
-for target in "$HOME/.claude/skills" "$HOME/.copilot/skills" "$HOME/.gemini/skills"; do
+# Skills → the three CLIs plus the Agent Skills standard dir (~/.agents/skills)
+for target in "$HOME/.claude/skills" "$HOME/.copilot/skills" "$HOME/.gemini/skills" "$HOME/.agents/skills"; do
   mkdir -p "$target"
   for d in "$REPO/skills"/*/; do
     name="$(basename "$d")"
