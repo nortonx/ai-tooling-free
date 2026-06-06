@@ -1,0 +1,4 @@
+# cocogitto config — portable release core (any forge or fully local)
+# Release flow: see .github/workflows/release-pr.yml and release-publish.yml
+tag_prefix = "v"
+ignore_merge_commits = true

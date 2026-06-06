@@ -1,0 +1,28 @@
+# Lints PR commits against the conventional commit spec with `cog check`.
+# Guarantees the changelog never silently misses a change.
+name: conventional-commits
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  COG_VERSION: "7.0.0"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install cocogitto
+        run: |
+          curl -sSL "https://github.com/cocogitto/cocogitto/releases/download/${COG_VERSION}/cocogitto-${COG_VERSION}-x86_64-unknown-linux-musl.tar.gz" | tar xz
+          sudo mv x86_64-unknown-linux-musl/cog /usr/local/bin/cog
+
+      - name: Check PR commits
+        run: cog check --ignore-merge-commits "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"

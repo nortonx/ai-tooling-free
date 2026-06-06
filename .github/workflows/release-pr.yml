@@ -1,0 +1,70 @@
+# Opens/updates a release PR (the human gate) whenever releasable
+# conventional commits land on main. Nothing releases until the PR is merged.
+# GitHub-specific shell — the version/changelog logic is `cog bump` (portable).
+name: release-pr
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-pr
+  cancel-in-progress: true
+
+env:
+  COG_VERSION: "7.0.0"
+
+jobs:
+  release-pr:
+    # Skip the push produced by merging the release PR itself
+    if: >-
+      !contains(github.event.head_commit.message, 'chore(release)') &&
+      !contains(github.event.head_commit.message, 'release/next')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install cocogitto
+        run: |
+          curl -sSL "https://github.com/cocogitto/cocogitto/releases/download/${COG_VERSION}/cocogitto-${COG_VERSION}-x86_64-unknown-linux-musl.tar.gz" | tar xz
+          sudo mv x86_64-unknown-linux-musl/cog /usr/local/bin/cog
+          cog --version
+
+      - name: Compute next version and changelog
+        id: bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          NEXT="$(cog bump --auto --dry-run || true)"
+          if ! echo "$NEXT" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "No releasable commits since last tag. cog said: $NEXT"
+            echo "version=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # cog bump creates the changelog commit AND a local tag;
+          # keep the commit, drop the tag (tagging happens on PR merge).
+          cog bump --auto
+          VERSION="$(git describe --tags --abbrev=0)"
+          git tag -d "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Push release branch and open/update PR
+        if: steps.bump.outputs.version != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          git push origin HEAD:release/next --force
+          BODY="Merge this PR to release **${VERSION}** (tag + GitHub Release). The diff is the changelog."
+          if gh pr list --head release/next --state open --json number --jq length | grep -q '^0$'; then
+            gh pr create --base main --head release/next \
+              --title "chore(release): ${VERSION}" --body "$BODY"
+          else
+            gh pr edit release/next --title "chore(release): ${VERSION}" --body "$BODY"
+          fi
