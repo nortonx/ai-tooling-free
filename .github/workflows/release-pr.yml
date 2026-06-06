@@ -17,6 +17,10 @@ concurrency:
 
 env:
   COG_VERSION: "7.0.0"
+  # sha256 of cocogitto-7.0.0-x86_64-unknown-linux-musl.tar.gz (upstream
+  # publishes no checksums; pinned manually, cross-checked against aqua's
+  # independently verified copy)
+  COG_SHA256: "e03938ff2c4c86d71c00c0f3284dbbe95c5ca76fe34a51f33e945c23010d59bb"
 
 jobs:
   release-pr:
@@ -32,8 +36,10 @@ jobs:
 
       - name: Install cocogitto
         run: |
-          curl -sSL "https://github.com/cocogitto/cocogitto/releases/download/${COG_VERSION}/cocogitto-${COG_VERSION}-x86_64-unknown-linux-musl.tar.gz" | tar xz
-          sudo mv x86_64-unknown-linux-musl/cog /usr/local/bin/cog
+          curl -fsSL "https://github.com/cocogitto/cocogitto/releases/download/${COG_VERSION}/cocogitto-${COG_VERSION}-x86_64-unknown-linux-musl.tar.gz" -o /tmp/cog.tar.gz
+          echo "${COG_SHA256}  /tmp/cog.tar.gz" | sha256sum -c -
+          tar xzf /tmp/cog.tar.gz -C /tmp
+          sudo mv /tmp/x86_64-unknown-linux-musl/cog /usr/local/bin/cog
           cog --version
 
       - name: Compute next version and changelog
@@ -41,7 +47,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          NEXT="$(cog bump --auto --dry-run || true)"
+          # "Nothing to release" exits 0 with a message (verified, cog 7.0.0),
+          # so a non-zero exit is a real failure and must fail the job.
+          if ! NEXT="$(cog bump --auto --dry-run 2>&1)"; then
+            echo "cog bump --dry-run failed:"
+            echo "$NEXT"
+            exit 1
+          fi
           if ! echo "$NEXT" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "No releasable commits since last tag. cog said: $NEXT"
             echo "version=" >> "$GITHUB_OUTPUT"
@@ -60,7 +72,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.bump.outputs.version }}
         run: |
-          git push origin HEAD:release/next --force
+          git push origin HEAD:release/next --force-with-lease
           BODY="Merge this PR to release **${VERSION}** (tag + GitHub Release). The diff is the changelog."
           if gh pr list --head release/next --state open --json number --jq length | grep -q '^0$'; then
             gh pr create --base main --head release/next \
