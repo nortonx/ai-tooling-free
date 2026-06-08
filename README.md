@@ -34,7 +34,7 @@ Windows uses directory junctions (`mklink /J`) — **no admin rights or Develope
 
 Does:
 
-- Symlinks each skill into `~/.claude/skills`, `~/.copilot/skills`, `~/.gemini/skills`, and `~/.agents/skills` — the last is the canonical user dir of the [Agent Skills open standard](https://agentskills.io), so one link target covers Codex CLI, Cursor, and every other adopter
+- Symlinks each skill into `~/.claude/skills`, `~/.copilot/skills`, and `~/.agents/skills` — the last is the canonical user dir of the [Agent Skills open standard](https://agentskills.io), so one link target covers Codex CLI, Cursor, Gemini CLI / Antigravity, and every other adopter. (Skills are *not* also linked into `~/.gemini/skills` — Gemini treats `~/.agents/skills` as a same-tier alias that takes precedence, so populating both makes it warn that every skill "overrides" its duplicate. Setup prunes any `~/.gemini/skills` links left by older installs.)
 - Links each agent into `~/.claude/agents` (Claude Code only; copied on Windows)
 - Backs up anything already at a destination to `<name>.bak` before linking
 - Is idempotent — re-run it any time
