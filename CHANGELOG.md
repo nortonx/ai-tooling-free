@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.1.1 - 2026-06-08
+#### Bug Fixes
+- (**setup**) stop duplicating skills into ~/.gemini/skills, add confirmation prompt (#5) - (a4ecaca) - Norton Almeida
+#### Miscellaneous Chores
+- (**version**) v0.1.0 (#4) - (73905d5) - github-actions[bot], *github-actions[bot]*
+
+- - -
+
 ## v0.1.0 - 2026-06-06
 #### Features
 - add cocogitto release automation (#2) - (6f788a7) - Norton Almeida
