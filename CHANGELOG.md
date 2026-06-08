@@ -9,6 +9,18 @@ All notable changes to this project will be documented in this file. See [conven
 #### Refactoring
 - drop Svelte from framework-upgrade-guide, refresh Angular/React references - (e91ac99) - Norton Almeida
 #### Miscellaneous Chores
+- (**version**) v0.1.0 (#3) - (9078219) - github-actions[bot], *github-actions[bot]*
+- initial public release — 16 skills, 10 agents, cross-platform setup - (010f63b) - Norton Almeida
+
+- - -
+
+## v0.1.0 - 2026-06-06
+#### Features
+- add cocogitto release automation (#2) - (6f788a7) - Norton Almeida
+- link skills into Agent Skills standard dir (Codex CLI, Cursor) (#1) - (be2eef6) - Norton Almeida
+#### Refactoring
+- drop Svelte from framework-upgrade-guide, refresh Angular/React references - (e91ac99) - Norton Almeida
+#### Miscellaneous Chores
 - initial public release — 16 skills, 10 agents, cross-platform setup - (010f63b) - Norton Almeida
 
 - - -
