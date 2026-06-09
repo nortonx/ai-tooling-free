@@ -1,8 +1,8 @@
 # ai-tooling-free setup — Windows (PowerShell 5.1+ or pwsh 7+)
 #
-# Creates directory junctions for each skill into ~\.claude\skills,
-# ~\.copilot\skills and ~\.agents\skills (the Agent Skills open-standard dir —
-# Codex CLI, Cursor, Gemini CLI, Antigravity, etc.), and copies each agent into
+# Creates directory junctions for each skill into ~\.claude\skills and
+# ~\.agents\skills (the Agent Skills open-standard dir — Copilot CLI, Codex CLI,
+# Cursor, Gemini CLI, Antigravity, etc.), and copies each agent into
 # ~\.claude\agents. Junctions need no admin rights or Developer Mode.
 # Anything already at a destination is backed up to <name>.bak first.
 # It never reads or writes settings.json, models, themes, or global
@@ -31,7 +31,7 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 if (-not ($Yes -or $env:ASSUME_YES -eq '1')) {
     Write-Host ''
     Write-Host 'This script modifies ONLY your home directory:' -ForegroundColor Yellow
-    Write-Host '  - junctions each skill into ~\.claude\skills, ~\.copilot\skills, ~\.agents\skills' -ForegroundColor Yellow
+    Write-Host '  - junctions each skill into ~\.claude\skills, ~\.agents\skills' -ForegroundColor Yellow
     Write-Host '  - copies each agent into ~\.claude\agents' -ForegroundColor Yellow
     Write-Host '  - backs up anything already there to <name>.bak' -ForegroundColor Yellow
     Write-Host '  It needs NO admin and never writes settings.json, models, themes, or' -ForegroundColor Yellow
@@ -67,12 +67,13 @@ function Copy-File($Src, $Dst) {
     Info "Copied $Dst"
 }
 
-# Skills -> Claude Code, Copilot CLI, plus the Agent Skills standard dir
-# (~\.agents\skills). Gemini CLI and Antigravity also read ~\.agents\skills, so
-# we do NOT also junction into ~\.gemini\skills — Gemini treats it as a same-tier
-# alias and would warn that every skill "overrides" its duplicate.
+# Skills -> Claude Code (~\.claude\skills) plus the Agent Skills standard dir
+# (~\.agents\skills), which Copilot, Codex CLI, Cursor, Gemini CLI and Antigravity
+# all read. We do NOT also junction into ~\.copilot\skills: Copilot reads
+# ~\.agents\skills too, so populating both made it list every skill twice (it does
+# not dedup — github/copilot-cli#2161). Likewise not ~\.gemini\skills — Gemini
+# treats ~\.agents\skills as a same-tier alias that takes precedence.
 foreach ($target in @("$env:USERPROFILE\.claude\skills",
-                      "$env:USERPROFILE\.copilot\skills",
                       "$env:USERPROFILE\.agents\skills")) {
     New-Item -ItemType Directory -Force -Path $target | Out-Null
     Get-ChildItem -Directory "$Repo\skills" | ForEach-Object {
@@ -96,6 +97,24 @@ if (Test-Path $geminiSkills) {
     if (-not (Get-ChildItem -LiteralPath $geminiSkills -Force -ErrorAction SilentlyContinue)) {
         Remove-Item -LiteralPath $geminiSkills -Force
         Warn "Removed empty $geminiSkills"
+    }
+}
+
+# Self-healing: an older version junctioned skills into ~\.copilot\skills. Copilot
+# also reads ~\.agents\skills, so remove the junctions we created (those pointing
+# into $Repo\skills), keep user-added ones, and drop the dir if empty.
+$copilotSkills = "$env:USERPROFILE\.copilot\skills"
+if (Test-Path $copilotSkills) {
+    Get-ChildItem -LiteralPath $copilotSkills -Force -ErrorAction SilentlyContinue | ForEach-Object {
+        if (($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -and
+            $_.Target -eq (Join-Path "$Repo\skills" $_.Name)) {
+            cmd /c rmdir "$($_.FullName)" | Out-Null
+            Warn "Unlinked stale Copilot skill: $($_.FullName)"
+        }
+    }
+    if (-not (Get-ChildItem -LiteralPath $copilotSkills -Force -ErrorAction SilentlyContinue)) {
+        Remove-Item -LiteralPath $copilotSkills -Force
+        Warn "Removed empty $copilotSkills"
     }
 }
 
