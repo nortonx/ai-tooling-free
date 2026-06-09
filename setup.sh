@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ai-tooling-free setup — macOS / Linux / WSL2
 #
-# Symlinks each skill into ~/.claude/skills, ~/.copilot/skills and
-# ~/.agents/skills (the Agent Skills open-standard dir — Codex CLI, Cursor,
-# Gemini CLI, Antigravity, etc.), and each agent into ~/.claude/agents.
+# Symlinks each skill into ~/.claude/skills and ~/.agents/skills (the Agent
+# Skills open-standard dir — Copilot CLI, Codex CLI, Cursor, Gemini CLI,
+# Antigravity, etc.), and each agent into ~/.claude/agents.
 # Anything already at a destination is backed up to <name>.bak first.
 # It never reads or writes settings.json, models, themes, or global
 # instruction files. Re-running is safe (idempotent).
@@ -38,7 +38,7 @@ case " $* " in *" -y "*|*" --yes "*) ASSUME_YES=1 ;; esac
 if [ "${ASSUME_YES:-}" != "1" ]; then
   printf '\n\033[33m'
   echo "This script modifies ONLY your home directory ($HOME):"
-  echo "  - symlinks each skill into ~/.claude/skills, ~/.copilot/skills, ~/.agents/skills"
+  echo "  - symlinks each skill into ~/.claude/skills, ~/.agents/skills"
   echo "  - symlinks each agent into ~/.claude/agents"
   echo "  - backs up anything already there to <name>.bak"
   echo "It uses NO sudo and never writes settings.json, models, themes, or"
@@ -63,11 +63,13 @@ link() {
   info "Linked $dst -> $src"
 }
 
-# Skills → Claude Code, Copilot CLI, plus the Agent Skills standard dir
-# (~/.agents/skills). Gemini CLI and Antigravity also read ~/.agents/skills, so
-# we do NOT also link into ~/.gemini/skills — Gemini treats it as a same-tier
-# alias and would warn that every skill "overrides" its duplicate.
-for target in "$HOME/.claude/skills" "$HOME/.copilot/skills" "$HOME/.agents/skills"; do
+# Skills → Claude Code (~/.claude/skills) plus the Agent Skills standard dir
+# (~/.agents/skills), which Copilot, Codex CLI, Cursor, Gemini CLI and Antigravity
+# all read. We do NOT also link into ~/.copilot/skills: Copilot reads
+# ~/.agents/skills too, so populating both made it list every skill twice (it does
+# not dedup — github/copilot-cli#2161). Likewise not ~/.gemini/skills — Gemini
+# treats ~/.agents/skills as a same-tier alias that takes precedence.
+for target in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
   mkdir -p "$target"
   for d in "$REPO/skills"/*/; do
     name="$(basename "$d")"
@@ -86,6 +88,20 @@ if [ -d "$HOME/.gemini/skills" ]; then
     esac
   done
   rmdir "$HOME/.gemini/skills" 2>/dev/null && info "Removed empty ~/.gemini/skills" || true
+fi
+
+# Self-healing: an older version of this script linked skills into
+# ~/.copilot/skills. Copilot also reads ~/.agents/skills, so remove the symlinks
+# we created there (those pointing into $REPO/skills), leave any user-added
+# skills, and drop the dir if empty.
+if [ -d "$HOME/.copilot/skills" ]; then
+  for l in "$HOME/.copilot/skills"/*; do
+    [ -L "$l" ] || continue
+    case "$(readlink -f "$l" 2>/dev/null)" in
+      "$REPO/skills/"*) rm -f "$l" && info "Unlinked stale Copilot skill: $l" ;;
+    esac
+  done
+  rmdir "$HOME/.copilot/skills" 2>/dev/null && info "Removed empty ~/.copilot/skills" || true
 fi
 
 # Agents → Claude Code only (per-file, so your own agents are untouched)
