@@ -77,9 +77,22 @@ Skills work in Claude Code, Copilot CLI, Gemini CLI, and Agent Skills adopters l
 - **Copilot and Cursor scan both `~/.claude/skills` and `~/.agents/skills` without de-duplicating**, so they list each skill **twice**. This is inherent, not a setup bug: Claude Code reads only `~/.claude/skills` and Codex reads only `~/.agents/skills`, so both roots must stay populated, and Copilot/Cursor read both. Removing `~/.copilot/skills` brings Copilot down from three entries to two; reaching exactly one would mean dropping Claude Code or waiting on Copilot to de-dup ([github/copilot-cli#2161](https://github.com/github/copilot-cli/issues/2161)). The duplicate links resolve to the same target, so it's cosmetic.
 - **Skill discovery in Codex/Cursor hasn't been smoke-tested by this setup** — the links follow the documented Agent Skills locations; verify with `/skills` (Codex) or the Agent skill list (Cursor) after install.
 
-## Agents (Claude Code only)
+## Agents (**Claude Code only**)
 
 `communication-excellence-coach` · `debugger` · `doc-writer` · `mermaid-diagram-specialist` · `performance-optimizer` · `refactoring-expert` · `security-auditor` · `system-architect` · `test-automator` · `ui-ux-designer`
+
+Agents are **subagents** — specialist personas Claude Code delegates to in their own context window. Unlike skills, they have no slash command, and only Claude Code supports them (Copilot CLI, Gemini, and Codex have no subagent mechanism, so setup doesn't link agents into them).
+
+Two ways to use one:
+
+- **Automatic** — Claude reads each agent's `description` and delegates when the task fits (several are marked *"Use PROACTIVELY"*).
+- **Explicit** — name the agent in your prompt:
+
+  ```
+  > Use the debugger subagent to find why this test fails
+  ```
+
+Manage installed agents with the `/agents` command.
 
 ## Uninstall
 
