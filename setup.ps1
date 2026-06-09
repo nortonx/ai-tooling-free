@@ -1,3 +1,9 @@
+# ────────────────────────────────────────────────────────────────────────────
+# GENERATED FILE — do not edit the copy in ai-tooling-free\.
+# Source of truth: ai-tooling\templates\ai-tooling-free.setup.ps1
+# ai-tooling\setup.ps1 rewrites ai-tooling-free\setup.ps1 from this template on
+# every run (when that sibling repo is present). Edit the template, then re-run.
+# ────────────────────────────────────────────────────────────────────────────
 # ai-tooling-free setup — Windows (PowerShell 5.1+ or pwsh 7+)
 #
 # Creates directory junctions for each skill into ~\.claude\skills and
