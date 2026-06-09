@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.1.2 - 2026-06-09
+#### Bug Fixes
+- (**setup**) stop linking skills into ~/.copilot/skills (#7) - (2ea3c23) - Norton Almeida
+
+- - -
+
 ## v0.1.1 - 2026-06-08
 #### Bug Fixes
 - (**setup**) stop duplicating skills into ~/.gemini/skills, add confirmation prompt (#5) - (a4ecaca) - Norton Almeida
