@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# ────────────────────────────────────────────────────────────────────────────
+# GENERATED FILE — do not edit the copy in ai-tooling-free/.
+# Source of truth: ai-tooling/templates/ai-tooling-free.setup.sh
+# ai-tooling/setup.sh rewrites ai-tooling-free/setup.sh from this template on
+# every run (when that sibling repo is present). Edit the template, then re-run.
+# ────────────────────────────────────────────────────────────────────────────
 # ai-tooling-free setup — macOS / Linux / WSL2
 #
 # Symlinks each skill into ~/.claude/skills and ~/.agents/skills (the Agent
