@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file. See [conven
 ## v0.1.2 - 2026-06-09
 #### Bug Fixes
 - (**setup**) stop linking skills into ~/.copilot/skills (#7) - (2ea3c23) - Norton Almeida
+#### Miscellaneous Chores
+- (**version**) v0.1.2 (#8) - (4694ce9) - github-actions[bot], *github-actions[bot]*
+
+- - -
+
+## v0.1.2 - 2026-06-09
+#### Bug Fixes
+- (**setup**) stop linking skills into ~/.copilot/skills (#7) - (2ea3c23) - Norton Almeida
 
 - - -
 
