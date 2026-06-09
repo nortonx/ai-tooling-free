@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.2.0 - 2026-06-09
+#### Features
+- add fix-security-audit skill (#10) - (af6b977) - Norton Almeida
+#### Miscellaneous Chores
+- (**version**) v0.1.2 (#9) - (fb5abcd) - github-actions[bot], *github-actions[bot]*
+
+- - -
+
 ## v0.1.2 - 2026-06-09
 #### Bug Fixes
 - (**setup**) stop linking skills into ~/.copilot/skills (#7) - (2ea3c23) - Norton Almeida
