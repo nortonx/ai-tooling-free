@@ -108,18 +108,23 @@ Manage installed agents with the `/agents` command.
 
 ## Uninstall
 
-Setup only creates links (plus `.bak` backups) — nothing of yours is deleted. To remove:
+The repository provides automated scripts that completely remove all installed skills and subagent links, and restore any pre-existing backups (`.bak`) that were displaced during setup.
+
+### macOS / Linux / WSL2
+
+Run the following command:
 
 ```bash
-# remove the skill symlinks this repo created
-for d in ~/.claude/skills ~/.copilot/skills ~/.gemini/skills ~/.agents/skills; do
-  find "$d" -maxdepth 1 -type l -lname "*/ai-tooling-free/*" -delete
-done
-# remove the agent links
-find ~/.claude/agents -maxdepth 1 -type l -lname "*/ai-tooling-free/*" -delete
+./uninstall.sh
 ```
 
-On Windows, delete the junctions under `%USERPROFILE%\.claude\skills` (and `.copilot`, `.gemini`, `.agents`) — `rmdir <name>` removes a junction without touching this repo. Restore any `.bak` files you want back.
+### Windows
+
+Run the following command:
+
+```bat
+uninstall.cmd
+```
 
 ## License
 
