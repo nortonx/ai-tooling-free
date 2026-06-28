@@ -12,7 +12,21 @@ Curated, cross-platform AI coding **skills** and **agents** for [Claude Code](ht
 
 ## Install
 
-### macOS / Linux / WSL2
+You can install these skills globally using the Agent Skills CLI, or run the local setup scripts.
+
+### Method 1: Using Agent Skills CLI (Recommended for skills only)
+
+You can install all skills globally without cloning the repository by running:
+
+```bash
+npx skills add nortonx/ai-tooling-free -g
+```
+
+### Method 2: Cloning and running Setup (Recommended for skills + agents)
+
+Use this method if you want to install both the skills and the Claude Code subagents:
+
+#### macOS / Linux / WSL2
 
 ```bash
 git clone https://github.com/nortonx/ai-tooling-free
@@ -20,7 +34,7 @@ cd ai-tooling-free
 ./setup.sh
 ```
 
-### Windows
+#### Windows
 
 ```bat
 git clone https://github.com/nortonx/ai-tooling-free
@@ -28,23 +42,21 @@ cd ai-tooling-free
 setup.cmd
 ```
 
-Windows uses directory junctions (`mklink /J`) — **no admin rights or Developer Mode needed**. `setup.cmd` works with both Windows PowerShell 5.1 and pwsh 7+.
+Windows installation works with both Windows PowerShell 5.1 and pwsh 7+ (no admin rights needed).
 
 ## What setup does (and doesn't)
 
 Does:
 
-- Symlinks each skill into `~/.claude/skills` (Claude Code) and `~/.agents/skills` — the latter is the canonical user dir of the [Agent Skills open standard](https://agentskills.io), so one link target covers Copilot CLI, Codex CLI, Cursor, Gemini CLI / Antigravity, and every other adopter. (Skills are *not* also linked into `~/.copilot/skills` — Copilot reads `~/.agents/skills` too, and since it reads both roots without de-duplicating it would list every skill twice; nor into `~/.gemini/skills` — Gemini treats `~/.agents/skills` as a same-tier alias that takes precedence. Setup prunes any `~/.copilot/skills` and `~/.gemini/skills` links left by older installs.)
-- Links each agent into `~/.claude/agents` (Claude Code only; copied on Windows)
-- Backs up anything already at a destination to `<name>.bak` before linking
-- Is idempotent — re-run it any time
+- Uses the official `skills` CLI (`npx skills`) to install all skills globally (covers Claude Code, Copilot CLI, Cursor, Codex, Gemini/Antigravity, and other adopters).
+- Links each agent into `~/.claude/agents` (Claude Code only, copied on Windows).
+- Is idempotent, so re-running it is safe at any time.
 
 Doesn't:
 
-- Touch your `settings.json`, model, theme, permissions, or plugins
-- Deploy any global `CLAUDE.md` / instruction files
-- Delete anything (backups only)
-- Require `jq`, Node, or anything beyond a shell
+- Touch your `settings.json`, model, theme, permissions, or plugins.
+- Deploy any global `CLAUDE.md` or instruction files.
+- Delete any of your existing files.
 
 ## Skills
 
@@ -77,11 +89,11 @@ Skills work in Claude Code, Copilot CLI, Gemini CLI, and Agent Skills adopters l
 - **Copilot and Cursor scan both `~/.claude/skills` and `~/.agents/skills` without de-duplicating**, so they list each skill **twice**. This is inherent, not a setup bug: Claude Code reads only `~/.claude/skills` and Codex reads only `~/.agents/skills`, so both roots must stay populated, and Copilot/Cursor read both. Removing `~/.copilot/skills` brings Copilot down from three entries to two; reaching exactly one would mean dropping Claude Code or waiting on Copilot to de-dup ([github/copilot-cli#2161](https://github.com/github/copilot-cli/issues/2161)). The duplicate links resolve to the same target, so it's cosmetic.
 - **Skill discovery in Codex/Cursor hasn't been smoke-tested by this setup** — the links follow the documented Agent Skills locations; verify with `/skills` (Codex) or the Agent skill list (Cursor) after install.
 
-## Agents (**Claude Code only**)
+## Agents
 
 `communication-excellence-coach` · `debugger` · `doc-writer` · `mermaid-diagram-specialist` · `performance-optimizer` · `refactoring-expert` · `security-auditor` · `system-architect` · `test-automator` · `ui-ux-designer`
 
-Agents are **subagents** — specialist personas Claude Code delegates to in their own context window. Unlike skills, they have no slash command, and only Claude Code supports them (Copilot CLI, Gemini, and Codex have no subagent mechanism, so setup doesn't link agents into them).
+Agents are **subagents** (specialist personas). Only Claude Code supports global subagents via `~/.claude/agents/` (Google Antigravity supports subagents via workspace configuration or custom plugins, but not via a global folder, so setup only links subagents to Claude Code).
 
 Two ways to use one:
 
