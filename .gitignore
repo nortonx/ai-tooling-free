@@ -2,3 +2,8 @@
 Thumbs.db
 .vscode/
 .idea/
+
+.agent/
+.claude/
+.gemini/
+openspec/
