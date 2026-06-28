@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.3.0 - 2026-06-28
+#### Features
+- create setup backup and uninstall scripts to revert changes - (2f09fe2) - Norton Almeida
+#### Refactoring
+- use npx skills for setup and add Antigravity (#13) - (ce1bcf9) - Norton Almeida
+#### Miscellaneous Chores
+- (**version**) v0.2.0 (#12) - (9c69cb4) - github-actions[bot], *github-actions[bot]*
+
+- - -
+
 ## v0.2.0 - 2026-06-13
 #### Features
 - add fix-security-audit skill (#10) - (af6b977) - Norton Almeida
