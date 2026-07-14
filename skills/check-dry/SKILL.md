@@ -16,7 +16,7 @@ argument-hint: "[branch | <path>]"
 - If you pass anything else (a non-existent path, an unrecognized flag), the skill stops and asks for clarification rather than guessing.
 - **Examples**: `/check-dry`, `/check-dry branch`, `/check-dry src/services`
 
-> Copilot CLI note: `$ARGUMENTS` doesn't substitute in skills — include the argument inline in your prompt.
+> Copilot CLI note: `$ARGUMENTS` doesn't substitute in skills - include the argument inline in your prompt.
 
 # Check DRY Violations
 
@@ -35,7 +35,7 @@ Determine scope from `$ARGUMENTS`, in this order:
 
 Flag duplication only when it meets **all** of these:
 1. Code appears 3+ times (two occurrences may be coincidental)
-2. The duplicated blocks change together — shared intent, not just shared syntax
+2. The duplicated blocks change together - shared intent, not just shared syntax
 3. A single abstraction (function, component, module) can replace all occurrences without forced generality
 
 Ignore: boilerplate required by the framework, test setup/fixtures, and config files.
@@ -46,16 +46,16 @@ For each finding, report:
 
 - **File and line number(s)** of every duplicate occurrence
 - **What's duplicated** and why it matters (shared intent vs coincidental similarity)
-- **Proposed abstraction** — name, signature, and placement — with a code example
-- **Risk** — what breaks if refactored incorrectly
+- **Proposed abstraction** - name, signature, and placement - with a code example
+- **Risk** - what breaks if refactored incorrectly
 
 Group findings by severity:
 
-- **Critical** — the duplication crosses module/package boundaries AND the same logic appears in 4+ places OR a divergence has already produced a bug (look for `git log -S <duplicated-snippet>` showing two parallel fixes). These usually want a new shared module/package.
-- **Improvement** — duplicated within a single module, 3+ occurrences, no divergence yet. Refactor with a local helper.
-- **Quick win** — small repeated patterns (≤5 lines each) that share intent but no behavior risk yet. Cosmetic.
+- **Critical** - the duplication crosses module/package boundaries AND the same logic appears in 4+ places OR a divergence has already produced a bug (look for `git log -S <duplicated-snippet>` showing two parallel fixes). These usually want a new shared module/package.
+- **Improvement** - duplicated within a single module, 3+ occurrences, no divergence yet. Refactor with a local helper.
+- **Quick win** - small repeated patterns (≤5 lines each) that share intent but no behavior risk yet. Cosmetic.
 
-End with a **Mentoring** section ONLY if at least one finding hits the rule-of-three boundary or shows a premature-abstraction risk. Skip the section entirely if findings are all mechanical duplication — don't pad.
+End with a **Mentoring** section ONLY if at least one finding hits the rule-of-three boundary or shows a premature-abstraction risk. Skip the section entirely if findings are all mechanical duplication - don't pad.
 
 End with an **Audit** line stating exactly what was scanned and what was returned:
 
@@ -67,7 +67,7 @@ If scope detection took the fallback (e.g., neither `main` nor `master` exists, 
 
 - **DO NOT implement fixes. DO NOT edit any files. Report only.**
 - Technical facts and data overrule opinions and personal preferences.
-- Match the codebase's existing module/file naming when proposing a new shared abstraction — do not introduce a new naming convention.
+- Match the codebase's existing module/file naming when proposing a new shared abstraction - do not introduce a new naming convention.
 - Focus on the code, not the developer.
 - Be concise: the proposed abstraction's signature plus a 5–10 line code example beats a paragraph of prose.
 

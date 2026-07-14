@@ -16,7 +16,7 @@ argument-hint: "[<file-or-module>]"
 - If the value doesn't resolve to an existing file or directory, the skill stops and asks rather than silently falling back to the whole branch diff.
 - **Examples**: `/check-tests`, `/check-tests src/auth.ts`
 
-> Copilot CLI note: `$ARGUMENTS` doesn't substitute in skills — include the argument inline in your prompt.
+> Copilot CLI note: `$ARGUMENTS` doesn't substitute in skills - include the argument inline in your prompt.
 
 # Check Branch Tests
 
@@ -31,7 +31,7 @@ Diff between this branch and the base branch. Resolve the base branch in this or
 3. Else `main` if it exists locally, else `master`.
 4. If neither exists, stop and ask which branch to diff against.
 
-If `$ARGUMENTS` is non-empty and resolves to an existing file or directory, narrow the scope to it. If `$ARGUMENTS` is a string that doesn't resolve to a real path, stop and ask — do not silently fall back to the whole branch diff.
+If `$ARGUMENTS` is non-empty and resolves to an existing file or directory, narrow the scope to it. If `$ARGUMENTS` is a string that doesn't resolve to a real path, stop and ask - do not silently fall back to the whole branch diff.
 
 ## Task
 
@@ -43,9 +43,9 @@ For each changed file in the diff:
 5. **AAA adherence**: flag tests missing clear Arrange / Act / Assert separation or with multiple logical assertions crammed in
 6. **FIRST compliance**: flag tests that are slow, order-dependent, non-repeatable (unmocked `time.now` / random), or rely on `print` instead of assertions
 7. **Flaky-test smells**: `sleep` / `setTimeout` / timing waits, unmocked clock or randomness, shared mutable state between tests
-8. **Mock placement**: flag mocks of the SUT or its internal helpers — mocks belong at boundaries (network, filesystem, clock, randomness) only
+8. **Mock placement**: flag mocks of the SUT or its internal helpers - mocks belong at boundaries (network, filesystem, clock, randomness) only
 9. **Behavior vs implementation**: flag assertions on private methods / internal data structures; public-contract assertions only
-10. **Near-duplicate tests**: flag pairs that differ only by input — should be parameterised
+10. **Near-duplicate tests**: flag pairs that differ only by input - should be parameterised
 11. **Name quality**: flag vague names like `test_1`, `works`, `happy`; expect `should_<expected>_when_<condition>` or `given_<state>_when_<action>_then_<outcome>`
 
 ## Output format
@@ -54,9 +54,9 @@ For each finding, report:
 
 - **File and line number(s)** of the changed code
 - **What's untested** and why it matters (risk, edge cases, regression surface)
-- **Suggested test cases** — with a code example of the missing test
+- **Suggested test cases** - with a code example of the missing test
 
-Group findings by severity: **Critical** (Untested — core logic, error paths) → **Improvement** (Partially tested — missing edge cases) → **Quick win** (Minor gaps — trivial branches)
+Group findings by severity: **Critical** (Untested - core logic, error paths) → **Improvement** (Partially tested - missing edge cases) → **Quick win** (Minor gaps - trivial branches)
 
 ### Verdict
 
@@ -66,9 +66,9 @@ Group findings by severity: **Critical** (Untested — core logic, error paths) 
 - Estimated branch coverage on scope: %
 - Flakiness-risk flags: N
 - Risk assessment:
-  - **LOW** — ≥80% estimated branch coverage AND zero flakiness flags AND no critical gaps.
-  - **MEDIUM** — 50–79% coverage, OR any flakiness flag, OR any improvement-severity gap.
-  - **HIGH** — <50% coverage, OR any critical gap (untested error path / untested core logic).
+  - **LOW** - ≥80% estimated branch coverage AND zero flakiness flags AND no critical gaps.
+  - **MEDIUM** - 50–79% coverage, OR any flakiness flag, OR any improvement-severity gap.
+  - **HIGH** - <50% coverage, OR any critical gap (untested error path / untested core logic).
 
 (80% is the LOW threshold because error-handling branches are the most common regression source in this repo's prior bugs; lower coverage typically leaves an entire `catch` or fallback branch untested. If the user passes `--coverage <n>`, use `<n>` instead.)
 
@@ -91,6 +91,6 @@ End with a **Mentoring** section: if any gap is a good learning opportunity, bri
 
 - **DO NOT write tests. DO NOT edit any files. Report only.**
 - Technical facts and data overrule opinions and personal preferences.
-- Match the project's existing test framework, file layout, and naming when suggesting new tests — do not propose Jest patterns in a Vitest project, etc.
+- Match the project's existing test framework, file layout, and naming when suggesting new tests - do not propose Jest patterns in a Vitest project, etc.
 - Focus on the code, not the developer.
 - Suggested-test examples should be 5–15 lines of runnable code, not prose.
