@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.3.1 - 2026-07-24
+#### Bug Fixes
+- remove bash escaping from setup.ps1 completion message - (78c8ea6) - Norton Almeida
+
+- - -
+
 ## v0.3.0 - 2026-07-04
 #### Features
 - create setup backup and uninstall scripts to revert changes - (2f09fe2) - Norton Almeida
