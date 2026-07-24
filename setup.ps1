@@ -48,4 +48,4 @@ Get-ChildItem "$Repo\agents\*.md" | ForEach-Object {
 }
 
 Write-Host "Setup complete!" -ForegroundColor Green
-Write-Host "You can revert this by running the \`uninstall.cmd\` (or \`uninstall.ps1\`) script." -ForegroundColor Green
+Write-Host "You can revert this by running the uninstall.cmd (or uninstall.ps1) script." -ForegroundColor Green
