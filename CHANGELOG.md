@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.4.0](https://github.com/nortonx/ai-tooling-free/compare/76dc059f7c0f82b868aac0485a5a1e6fb047f6ad..v0.4.0) - 2026-07-25
+#### Features
+- (**release**) collapse to single-phase cocogitto release - ([e0ce97a](https://github.com/nortonx/ai-tooling-free/commit/e0ce97a1d115afa4e130bca3744178aea848dfe8)) - Norton Almeida
+
+- - -
+
 ## v0.3.1 - 2026-07-24
 #### Bug Fixes
 - remove bash escaping from setup.ps1 completion message - (78c8ea6) - Norton Almeida
