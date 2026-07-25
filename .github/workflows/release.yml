@@ -1,0 +1,129 @@
+# Single-phase release: bump, changelog, commit, tag, push, GitHub Release, in one
+# workflow with no human step. Follows the fleet release standard, Track B
+# (dotfiles: docs/release-standard/SPEC.md).
+#
+# Replaces release-pr.yml + release-publish.yml. That two-phase flow opened a release
+# PR, and a second workflow published only when the merged PR's head ref was
+# `release/next`. Its correctness depended on the merge producing a specific shape,
+# which a squash-merge does not, and that is the root cause of the duplicate
+# v0.1.0 / v0.1.2 / v0.2.0 sections in CHANGELOG.md. There is no second workflow to
+# mis-trigger here.
+#
+# conventional-commits.yml is kept: it lints PR commits over a true range
+# (base.sha..head.sha) and is a stronger IR1 check than anything here.
+name: release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+# IR4. cancel-in-progress MUST stay false: cancelling mid-release can leave a tag
+# pushed with no GitHub Release, or a bumped commit with no tag.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  COG_VERSION: "7.0.0"          # IR10
+  # sha256 of cocogitto-7.0.0-x86_64-unknown-linux-musl.tar.gz (upstream publishes no
+  # checksums; pinned manually, cross-checked against aqua's independently verified copy)
+  COG_SHA256: "e03938ff2c4c86d71c00c0f3284dbbe95c5ca76fe34a51f33e945c23010d59bb"
+
+jobs:
+  # IR1 + IR2. GitHub Actions cannot express `needs:` across workflows, so the
+  # PR-time check in conventional-commits.yml cannot gate this workflow. This job is
+  # the push-time equivalent and the single fan-in point `release` depends on. Add any
+  # future required check here, not to `release` directly.
+  ci-success:
+    # IR6, receiving half. skip_ci in cog.toml stamps the marker; this skips on it.
+    # GitHub does not honour [skip ci] natively the way GitLab does, so without this
+    # guard the release commit retriggers the workflow.
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install cocogitto
+        run: |
+          curl -fsSL "https://github.com/cocogitto/cocogitto/releases/download/${COG_VERSION}/cocogitto-${COG_VERSION}-x86_64-unknown-linux-musl.tar.gz" -o /tmp/cog.tar.gz
+          echo "${COG_SHA256}  /tmp/cog.tar.gz" | sha256sum -c -
+          tar xzf /tmp/cog.tar.gz -C /tmp
+          sudo mv /tmp/x86_64-unknown-linux-musl/cog /usr/local/bin/cog
+
+      - name: Check commits since the last tag
+        # --from-latest-tag errors with "unable to get any tag" on a tagless repo,
+        # so pick the form that applies. Verified on cog 7.0.0.
+        run: |
+          if git describe --tags --abbrev=0 >/dev/null 2>&1; then
+            cog check --from-latest-tag
+          else
+            cog check
+          fi
+
+  release:
+    needs: [ci-success]         # IR2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # cog needs full tag history to compute the bump
+
+      - name: Install cocogitto
+        run: |
+          curl -fsSL "https://github.com/cocogitto/cocogitto/releases/download/${COG_VERSION}/cocogitto-${COG_VERSION}-x86_64-unknown-linux-musl.tar.gz" -o /tmp/cog.tar.gz
+          echo "${COG_SHA256}  /tmp/cog.tar.gz" | sha256sum -c -
+          tar xzf /tmp/cog.tar.gz -C /tmp
+          sudo mv /tmp/x86_64-unknown-linux-musl/cog /usr/local/bin/cog
+
+      - name: Bump, tag, push
+        id: bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Decide whether anything is releasable from the DRY RUN, not from the exit
+          # code of the real bump. Verified on cog 7.0.0: nothing releasable exits 0
+          # printing "No conventional commits ... required a bump"; something
+          # releasable prints the bare version.
+          #
+          # Do NOT collapse this into `if ! cog bump --auto; then exit 0; fi`. cog
+          # exits non-zero BOTH when nothing is releasable AND when post_bump_hooks
+          # fail (rejected push, branch protection). Conflating them turns a failed
+          # release green and can leave main bumped with no tag pushed, after which
+          # the next run computes from a stale tag.
+          if ! NEXT="$(cog bump --auto --dry-run 2>&1)"; then
+            echo "cog bump --dry-run failed:"
+            echo "$NEXT"
+            exit 1
+          fi
+          if ! echo "$NEXT" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "No releasable commits since the last tag. cog said: $NEXT"
+            echo "released=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Releasing $NEXT"
+          # IR6: --skip-ci is REQUIRED. cog.toml's skip_ci key only DEFINES the marker;
+          # cog appends it only when this flag is passed. Any non-zero from here is real.
+          cog bump --auto --skip-ci
+          echo "released=true" >> "$GITHUB_OUTPUT"
+          echo "version=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+
+      # IR9: a Release object, not a bare tag. The ambient GITHUB_TOKEN with
+      # `permissions: contents: write` is sufficient; no PAT is needed on GitHub.
+      - name: Create GitHub Release
+        if: steps.bump.outputs.released == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          cog changelog --at "$VERSION" > /tmp/notes.md
+          # Existence guard keeps a rerun after a partial failure safe.
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Release ${VERSION} already exists, skipping"
+          else
+            gh release create "$VERSION" --title "$VERSION" --notes-file /tmp/notes.md
+          fi

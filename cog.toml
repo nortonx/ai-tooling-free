@@ -1,4 +1,57 @@
-# cocogitto config — portable release core (any forge or fully local)
-# Release flow: see .github/workflows/release-pr.yml and release-publish.yml
-tag_prefix = "v"
+# cocogitto config: portable release core (any forge or fully local).
+# Release flow: single-phase, in `.github/workflows/release.yml`.
+# Follows the fleet release standard, Track B (dotfiles: docs/release-standard/SPEC.md).
+
+tag_prefix = "v"                  # IR8
 ignore_merge_commits = true
+branch_whitelist = ["main"]       # IR3, belt-and-braces with the workflow trigger
+
+# IR6. CAUTION: this key only DEFINES the marker string. cog appends it ONLY when
+# `cog bump` is invoked with `--skip-ci`. Setting it here and forgetting the flag
+# produces a bump commit with no marker. On GitHub that also breaks the release
+# workflow's own `if:` guard, which keys off the marker, so the workflow would
+# retrigger itself. That self-retrigger is how the duplicate v0.1.0/v0.1.2/v0.2.0
+# CHANGELOG sections below were produced under the old two-phase flow.
+skip_ci = "[skip ci]"
+
+# Single-phase release: these hooks make `cog bump` self-contained (bump, changelog,
+# commit, tag, push both). Replaces release-pr.yml -> merge -> release-publish.yml,
+# whose second workflow fired only when the merge commit matched a specific message.
+# A squash-merge never produced that message, which is the root cause of the
+# duplicate CHANGELOG entries.
+pre_bump_hooks = []
+# `git push origin HEAD`, never a bare `git push`: CI checks out a detached HEAD, so the
+# branch has no upstream and a bare push aborts after the commit and tag already exist.
+post_bump_hooks = [
+    "git push origin HEAD",
+    "git push origin {{version_tag}}",
+]
+
+# IR7 + IR9. template = "remote" renders linked commits and authors.
+# cog PREPENDS new sections, so existing history keeps its original format.
+[changelog]
+path = "CHANGELOG.md"
+template = "remote"
+remote = "github.com"
+owner = "nortonx"
+repository = "ai-tooling-free"
+
+# Mirrors Track A's bump and hidden-type rules so both tracks behave identically.
+# Keep in lockstep with dotfiles docs/release-standard/templates/.
+[commit_types]
+perf     = { changelog_title = "Performance", bump_patch = true }
+refactor = { changelog_title = "Refactoring", bump_patch = true }
+chore    = { omit_from_changelog = true }
+ci       = { omit_from_changelog = true }
+build    = { omit_from_changelog = true }
+style    = { omit_from_changelog = true }
+test     = { omit_from_changelog = true }
+docs     = { omit_from_changelog = true }
+
+# IR1, local leg. Native cog hooks, so this shell-only repo needs no Node toolchain.
+# Activate once per clone with `cog install-hook --all`; the config alone does not
+# write .git/hooks.
+[git_hooks.commit-msg]
+script = """#!/bin/sh
+cog verify --file $1
+"""
