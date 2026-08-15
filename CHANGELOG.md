@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.5.0](https://github.com/nortonx/ai-tooling-free/compare/7267c924429026f3ac51e411dafeb8eec5a2d559..v0.5.0) - 2026-08-15
+#### Features
+- (**takeaways**) add the takeaways skill - ([7267c92](https://github.com/nortonx/ai-tooling-free/commit/7267c924429026f3ac51e411dafeb8eec5a2d559)) - Norton Almeida
+
+- - -
+
 ## [v0.4.0](https://github.com/nortonx/ai-tooling-free/compare/76dc059f7c0f82b868aac0485a5a1e6fb047f6ad..v0.4.0) - 2026-07-25
 #### Features
 - (**release**) collapse to single-phase cocogitto release - ([e0ce97a](https://github.com/nortonx/ai-tooling-free/commit/e0ce97a1d115afa4e130bca3744178aea848dfe8)) - Norton Almeida
