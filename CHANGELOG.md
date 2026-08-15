@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.6.0](https://github.com/nortonx/ai-tooling-free/compare/5e22b56a1ebb2c34c06131b6522d562ce03dca12..v0.6.0) - 2026-08-15
+#### Features
+- (**takeaways**) add the takeaways skill - ([5e22b56](https://github.com/nortonx/ai-tooling-free/commit/5e22b56a1ebb2c34c06131b6522d562ce03dca12)) - Norton Almeida
+
+- - -
+
 ## [v0.5.0](https://github.com/nortonx/ai-tooling-free/compare/7267c924429026f3ac51e411dafeb8eec5a2d559..v0.5.0) - 2026-08-15
 #### Features
 - (**takeaways**) add the takeaways skill - ([7267c92](https://github.com/nortonx/ai-tooling-free/commit/7267c924429026f3ac51e411dafeb8eec5a2d559)) - Norton Almeida
