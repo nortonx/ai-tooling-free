@@ -1,6 +1,6 @@
 ---
 name: fanout-review
-description: Multi-perspective code review with breaking-change detection, a deterministic merge gate, and questions for the dev. Spawns 6 parallel reviewers. Output optimized for PR-thread copy/paste — GitHub, GitLab, or Azure DevOps (emoji semaphore, lists, backticked code).
+description: "Multi-perspective code review with breaking-change detection, a deterministic merge gate, and questions for the dev. Spawns 6 parallel reviewers. Output optimized for PR-thread copy/paste, supporting GitHub, GitLab, or Azure DevOps (emoji semaphore, lists, backticked code)."
 ---
 
 # Code review (multi-perspective)

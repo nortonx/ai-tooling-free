@@ -1,6 +1,7 @@
 ---
 name: takeaways
-description: "Extract conclusions and key takeaways from YouTube videos, Instagram Reels/posts, or long-form content, providing a fast comparison and a clear final verdict that directly answers the question or premise in the video's title."
+description: "Extract conclusions and key takeaways from YouTube videos, Instagram Reels/posts, or long-form content, providing a fast comparison and a clear final verdict that directly answers the question or premise in the video's title. Args: <url | text>"
+argument-hint: "<url | text>"
 ---
 
 ## Arguments

@@ -1,6 +1,6 @@
 ---
 name: framework-upgrade-guide
-description: "Analyze a TypeScript/Node project (Angular, React, or Vue), read its dependencies, flag deprecated/EOL packages and known vulnerabilities, and produce a careful stepwise major-by-major upgrade guide (e.g. Angular 15→16→17→18→19) written to a file. Use this whenever the user wants to upgrade, migrate, or modernize a front-end framework, bump major versions, plan a dependency migration, check what's deprecated, or asks how to get from their current framework version to the latest — even if they don't say the word 'upgrade'. Args: [<path-to-repo-or-package.json>]"
+description: "Stepwise major-by-major upgrade guide for TypeScript and Node projects (Angular, React, Vue), analyzing dependencies, deprecations, and EOL packages. Args: [<path-to-repo-or-package.json>]"
 argument-hint: "[<path-to-repo-or-package.json>]"
 ---
 

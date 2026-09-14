@@ -1,6 +1,6 @@
 ---
 name: fix-security-audit
-description: "Detect the JS/TS package manager, audit dependencies, and fix vulnerabilities safely — least-invasive first, with backup, re-audit, and full test/lint/format/e2e verification. Works with npm, pnpm, yarn, deno, bun. Args: [<path-to-project>]"
+description: "Detect the JS/TS package manager, audit dependencies, and fix vulnerabilities safely, least-invasive first, with backup, re-audit, and full test/lint/format/e2e verification. Works with npm, pnpm, yarn, deno, bun. Args: [<path-to-project>]"
 argument-hint: "[<path-to-project>]"
 ---
 

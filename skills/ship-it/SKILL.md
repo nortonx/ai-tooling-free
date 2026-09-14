@@ -1,7 +1,7 @@
 ---
 name: ship-it
-description: "Branch (if needed), commit, and push the current changes to remote in one step. Invoke only when the user explicitly runs /ship-it or asks to branch-commit-push — it reminds you to review first, then commits and pushes. Args: [branch-name-or-issue-id]"
-argument-hint: [branch-name-or-issue-id]
+description: "Branch (if needed), commit, and push the current changes to remote in one step. Invoke only when the user explicitly runs /ship-it or asks to branch-commit-push, it reminds you to review first, then commits and pushes. Args: [<branch-name-or-card>]"
+argument-hint: "[<branch-name-or-card>]"
 ---
 
 # Ship it
