@@ -1,6 +1,6 @@
 ---
 name: create-commit-message
-description: "Produce a single ready-to-paste conventional commit message with a `<type>: ` prefix from current git changes — invoke only when explicitly asked to write/draft/create a commit message."
+description: "Produce a single ready-to-paste conventional commit message with a `<type>: ` prefix from current git changes, invoke only when explicitly asked to write/draft/create a commit message."
 ---
 
 # Commit message
