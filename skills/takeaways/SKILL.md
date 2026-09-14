@@ -4,18 +4,78 @@ description: "Extract conclusions and key takeaways from YouTube videos, Instagr
 argument-hint: "<url | text>"
 ---
 
+<!-- Note: $ARGUMENTS is substituted by Claude commands only. In Copilot,
+     the user must include their argument inline in the prompt; the skill
+     body sees the literal text "$ARGUMENTS" unsubstituted. -->
+
 ## Arguments
 
-- `content`: The long-form content to extract takeaways from.
-- `rating`: The product rating or pros/cons rating to group takeaways by.
-- `video`: The YouTube or Instagram video URL to extract takeaways from.
-- `title`: (Optional) The title of the video or post caption if not directly extractable from the URL.
+`<url | text>`
 
-## Steps
+- Required. A URL to a video, social post, or article, OR raw text/transcript content.
+- **Examples**: `/takeaways https://www.youtube.com/watch?v=example`, `/takeaways <pasted transcript>`
 
-1. **Extract Content**: If a YouTube (video/Shorts) or Instagram (Reels/post) URL is provided, obtain the transcript, caption, or page content. If raw text is provided, use it directly.
-2. **Identify Video Title / Premise**: Identify the core question, debate, or promise in the video's title or caption (e.g., "Is X worth it?", "Product A vs Product B", "Does Y really work?").
-3. **Group Key Takeaways**: Organize the main findings, pros/cons, key features, or product ratings into a concise comparison.
-4. **Title-Driven Final Verdict**: Deliver a direct, unambiguous answer to the title's question or premise. Completely resolve any clickbait or teaser framing by stating the final decision, winner, or result up front.
+> Copilot CLI note: `$ARGUMENTS` does not substitute in skills; include the argument inline in your prompt.
 
+# Extract Takeaways: $ARGUMENTS
 
+Extract the core conclusions, pros, cons, and answers from long-form content, video transcripts, or social posts. Always resolve clickbait titles up front by delivering a direct, unambiguous verdict.
+
+## Step 1: Input Resolution
+
+Check the content provided in `$ARGUMENTS`:
+
+1. **Raw text or pasted transcript**: proceed directly to Step 2.
+2. **URL (YouTube, Instagram, article, podcast)**:
+   - If runtime browsing or fetching tools are available, attempt to retrieve page content or transcript.
+   - If external tools are unavailable, if scraping is blocked by captchas/auth, or if no captions are extractable, **stop and ask the user**:
+     > "Could not extract transcript automatically from `<url>`. Please paste the transcript, subtitles, or article text to continue."
+3. **Empty or missing argument**: stop and prompt:
+   > "Usage: `/takeaways <url | text>`. Please provide a URL or paste the content to analyze."
+
+## Step 2: Identify Core Premise and Title Question
+
+Identify the central question, debate, or promise in the title or opening framing (for example: "Is framework X worth learning?", "Tool A vs Tool B", "Does technique Y really work?").
+
+## Step 3: Group Findings and Key Points
+
+Synthesize the content into clear categories:
+- Primary claims and evidence presented
+- Concrete pros and cons
+- Product, tool, or methodology comparisons
+- Benchmark numbers, pricing, or measurable results
+
+## Step 4: Output Template
+
+Render the analysis in this structured format:
+
+```markdown
+# Takeaways: <Title or Subject>
+
+**Core Premise**: <The central question or debate investigated in the content>
+
+**Direct Verdict**: <Direct, definitive answer resolving any clickbait or open question up front>
+
+## Key Takeaways
+
+- **<Point 1>**: <Summary of finding with evidence or rationale>
+- **<Point 2>**: <Summary of finding with evidence or rationale>
+- **<Point 3>**: <Summary of finding with evidence or rationale>
+
+## Comparison / Breakdown
+
+| Subject / Option | Advantages | Disadvantages | Verdict |
+|---|---|---|---|
+| <Item A> | <Key strength> | <Key weakness> | <Assessment> |
+| <Item B> | <Key strength> | <Key weakness> | <Assessment> |
+
+## Actionable Recommendation
+
+<1-2 concise paragraphs summarizing practical advice, trade-offs, and when to choose what>
+```
+
+## Rules
+
+- State the final verdict directly up front; do not preserve clickbait suspense.
+- Do not invent facts, benchmarks, or opinions absent from the source content.
+- Be concise: prioritize bullet points and tables over dense prose.
