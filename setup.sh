@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 # ────────────────────────────────────────────────────────────────────────────
-# GENERATED FILE — do not edit the copy in ai-tooling-free/.
-# Source of truth: ai-tooling/templates/ai-tooling-free.setup.sh
-# ai-tooling/setup.sh rewrites ai-tooling-free/setup.sh from this template on
-# every run (when that sibling repo is present). Edit the template, then re-run.
-# ────────────────────────────────────────────────────────────────────────────
-# ai-tooling-free setup — macOS / Linux / WSL2
+# ai-tooling-free setup (macOS / Linux / WSL2)
 #
 # Installs skills globally utilizing the Agent Skills CLI (npx skills)
 # and symlinks Claude Code subagents into ~/.claude/agents/.
+# ────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")" && pwd)"
