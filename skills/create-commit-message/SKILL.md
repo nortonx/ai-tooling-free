@@ -11,7 +11,7 @@ description: "Produce a single ready-to-paste conventional commit message with a
 2. Read unstaged changes: `git diff`
 3. Read recent commits for style match: `git log --oneline -10`
 4. If both diffs are empty, stop and say "nothing to commit".
-5. Read the current branch name: `git branch --show-current` — if it contains an issue/ticket id, reference it per the repo's convention visible in `git log`.
+5. Read the current branch name (`git branch --show-current`). If it contains an issue/ticket id, reference it per the repo convention visible in `git log`.
 
 ## Output format
 
@@ -26,7 +26,7 @@ If the branch name contains an issue id (e.g. `123` in `feat/123-add-login`), in
 
 ## Rules
 
-- Be concise — focus on the "why", not the "what" (the diff shows the what)
+- Be concise: focus on the "why", not the "what" (the diff shows the what)
 - Use imperative mood: "add feature" not "added feature"
 - If changes span multiple concerns, suggest splitting into separate commits
 - Output only the message, ready to copy-paste
