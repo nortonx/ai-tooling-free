@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.6.4](https://github.com/nortonx/ai-tooling-free/compare/2358a8afdcc3d92261d7a8ea925adc9143e4b440..v0.6.4) - 2026-09-14
+#### Refactoring
+- (**skills**) improve instructional quality and eliminate fragile commands - ([2358a8a](https://github.com/nortonx/ai-tooling-free/commit/2358a8afdcc3d92261d7a8ea925adc9143e4b440)) - Norton Almeida
+
+- - -
+
 ## [v0.6.3](https://github.com/nortonx/ai-tooling-free/compare/a62188103111d305df4112fbb0cfe341c6ab74a8..v0.6.3) - 2026-09-14
 #### Bug Fixes
 - (**skills**) improve cross-platform portability and runtime interoperability - ([a621881](https://github.com/nortonx/ai-tooling-free/commit/a62188103111d305df4112fbb0cfe341c6ab74a8)) - Norton Almeida
