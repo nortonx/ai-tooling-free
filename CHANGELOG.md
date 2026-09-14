@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.6.2](https://github.com/nortonx/ai-tooling-free/compare/8f1bd97f1df76825496528d72d13c6b01712f7f5..v0.6.2) - 2026-09-14
+#### Bug Fixes
+- (**skills**) ensure Agent Skills YAML frontmatter compliance - ([8f1bd97](https://github.com/nortonx/ai-tooling-free/commit/8f1bd97f1df76825496528d72d13c6b01712f7f5)) - Norton Almeida
+
+- - -
+
 ## [v0.6.1](https://github.com/nortonx/ai-tooling-free/compare/f77f75962738421099664a3f34d7c17f854eb209..v0.6.1) - 2026-09-14
 #### Bug Fixes
 - (**uninstall**) prevent circular backup deletion and unsafe link unlinking - ([f77f759](https://github.com/nortonx/ai-tooling-free/commit/f77f75962738421099664a3f34d7c17f854eb209)) - Norton Almeida
