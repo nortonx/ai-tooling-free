@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.6.1](https://github.com/nortonx/ai-tooling-free/compare/f77f75962738421099664a3f34d7c17f854eb209..v0.6.1) - 2026-09-14
+#### Bug Fixes
+- (**uninstall**) prevent circular backup deletion and unsafe link unlinking - ([f77f759](https://github.com/nortonx/ai-tooling-free/commit/f77f75962738421099664a3f34d7c17f854eb209)) - Norton Almeida
+
+- - -
+
 ## [v0.6.0](https://github.com/nortonx/ai-tooling-free/compare/5e22b56a1ebb2c34c06131b6522d562ce03dca12..v0.6.0) - 2026-08-15
 #### Features
 - (**takeaways**) add the takeaways skill - ([5e22b56](https://github.com/nortonx/ai-tooling-free/commit/5e22b56a1ebb2c34c06131b6522d562ce03dca12)) - Norton Almeida
