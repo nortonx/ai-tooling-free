@@ -12,35 +12,58 @@ README_FILE = REPO_ROOT / "README.md"
 SETUP_SH = REPO_ROOT / "setup.sh"
 SETUP_PS1 = REPO_ROOT / "setup.ps1"
 
+def disk_skills():
+    return {p.parent.name for p in SKILLS_DIR.glob("*/SKILL.md")}
+
+def disk_agents():
+    return {p.stem for p in AGENTS_DIR.glob("*.md")}
+
+def table_rows(header):
+    """Return {name: [cells]} for the table rows under a README '## <header>' section."""
+    section = README_FILE.read_text(encoding="utf-8").split(f"## {header}\n", 1)[1].split("\n## ", 1)[0]
+    rows = {}
+    for line in section.splitlines():
+        if line.startswith("| `"):
+            cells = [c.strip() for c in re.split(r"(?<!\\)\|", line)[1:-1]]
+            rows[cells[0].strip("`")] = cells
+    return rows
+
+def argument_hint(skill):
+    content = (SKILLS_DIR / skill / "SKILL.md").read_text(encoding="utf-8")
+    match = re.search(r'^argument-hint:\s*"?(.*?)"?\s*$', content.split("\n---", 1)[0], re.MULTILINE)
+    return match.group(1) if match else None
+
 def test_readme_counts():
-    """Verify README accurately states 18 skills and 10 agents."""
+    """Verify the README count line matches the skills and agents on disk."""
     content = README_FILE.read_text(encoding="utf-8")
-    assert "18 skills, 10 agents" in content, "README does not state '18 skills, 10 agents'"
-    assert "16 skills" not in content, "README still contains obsolete '16 skills' count"
+    expected = f"{len(disk_skills())} skills, {len(disk_agents())} agents"
+    assert expected in content, f"README does not state '{expected}'"
 
 def test_readme_lists_all_skills():
-    """Verify README includes all 18 skills in the catalog table."""
-    content = README_FILE.read_text(encoding="utf-8")
-    skill_names = sorted(p.name for p in SKILLS_DIR.glob("*/") if p.is_dir())
-    assert len(skill_names) == 18, f"Expected 18 skills on disk, found {len(skill_names)}"
+    """Verify the Skills Catalog table lists exactly the skills on disk."""
+    listed = set(table_rows("Skills Catalog"))
+    missing = disk_skills() - listed
+    stale = listed - disk_skills()
+    assert not missing, "README catalog is missing skills:\n" + "\n".join(sorted(missing))
+    assert not stale, "README catalog lists skills not in skills/:\n" + "\n".join(sorted(stale))
 
-    missing = []
-    for name in skill_names:
-        if f"`{name}`" not in content and f"/{name}" not in content:
-            missing.append(name)
-    assert not missing, f"README is missing these skills from its catalog table:\n" + "\n".join(missing)
+def test_readme_skill_arguments():
+    """Verify each catalog Arguments cell matches the skill's argument-hint."""
+    errors = []
+    for name, cells in table_rows("Skills Catalog").items():
+        hint = argument_hint(name) if name in disk_skills() else None
+        expected = f"`{hint.replace('|', chr(92) + '|')}`" if hint else "None"
+        if cells[2] != expected:
+            errors.append(f"{name}: README has {cells[2]}, expected {expected}")
+    assert not errors, "README Arguments column drifted:\n" + "\n".join(errors)
 
 def test_readme_lists_all_agents():
-    """Verify README includes all 10 agents in the catalog table."""
-    content = README_FILE.read_text(encoding="utf-8")
-    agent_names = sorted(p.stem for p in AGENTS_DIR.glob("*.md"))
-    assert len(agent_names) == 10, f"Expected 10 agents on disk, found {len(agent_names)}"
-
-    missing = []
-    for name in agent_names:
-        if f"`{name}`" not in content and f"@{name}" not in content:
-            missing.append(name)
-    assert not missing, f"README is missing these agents from its catalog table:\n" + "\n".join(missing)
+    """Verify the Subagents table lists exactly the agents on disk."""
+    listed = set(table_rows("Subagents (Claude Code)"))
+    missing = disk_agents() - listed
+    stale = listed - disk_agents()
+    assert not missing, "README is missing agents:\n" + "\n".join(sorted(missing))
+    assert not stale, "README lists agents not in agents/:\n" + "\n".join(sorted(stale))
 
 def test_readme_no_em_dashes():
     """Verify README contains zero em dashes or prose spaced hyphens."""
@@ -67,6 +90,7 @@ def main():
     test_functions = [
         test_readme_counts,
         test_readme_lists_all_skills,
+        test_readme_skill_arguments,
         test_readme_lists_all_agents,
         test_readme_no_em_dashes,
         test_setup_scripts_clean_headers,

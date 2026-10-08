@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Automated test suite validating Agent Skills YAML frontmatter compliance.
-Verifies all 18 skills in skills/*/SKILL.md.
+Verifies all skills in skills/*/SKILL.md.
 """
 
 import os

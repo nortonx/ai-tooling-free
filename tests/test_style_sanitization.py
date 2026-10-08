@@ -8,10 +8,9 @@ import sys
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILLS_DIR = REPO_ROOT / "skills"
 
-def test_all_18_skills_zero_em_dashes():
+def test_all_skills_zero_em_dashes():
     """Verify that every SKILL.md in skills/ contains zero unicode em dashes."""
     skill_files = sorted(SKILLS_DIR.glob("*/SKILL.md"))
-    assert len(skill_files) == 18, f"Expected 18 skills, found {len(skill_files)}"
 
     errors = []
     total_em_dashes = 0
@@ -24,10 +23,9 @@ def test_all_18_skills_zero_em_dashes():
 
     assert not errors, f"Found {total_em_dashes} em dash(es) across {len(errors)} skills:\n" + "\n".join(errors)
 
-def test_all_18_skills_zero_prose_spaced_hyphens():
+def test_all_skills_zero_prose_spaced_hyphens():
     """Verify that every SKILL.md in skills/ contains zero prose spaced hyphens."""
     skill_files = sorted(SKILLS_DIR.glob("*/SKILL.md"))
-    assert len(skill_files) == 18, f"Expected 18 skills, found {len(skill_files)}"
 
     errors = []
     for skill_file in skill_files:
@@ -43,8 +41,8 @@ def test_all_18_skills_zero_prose_spaced_hyphens():
 
 def main():
     test_functions = [
-        test_all_18_skills_zero_em_dashes,
-        test_all_18_skills_zero_prose_spaced_hyphens,
+        test_all_skills_zero_em_dashes,
+        test_all_skills_zero_prose_spaced_hyphens,
     ]
     passed = 0
     failed = 0
