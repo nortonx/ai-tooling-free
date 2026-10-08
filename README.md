@@ -15,21 +15,21 @@ Curated, cross-platform AI coding **skills** and **agents** for Claude Code, Git
 | Skill | Command | Arguments | Description |
 |---|---|---|---|
 | `check-dry` | `/check-dry` | `[branch \| <path>]` | Detect DRY violations and recommend refactoring strategies. |
-| `check-dx` | `/check-dx` | `<eslint \| prettier \| biome>` | Audit enabled eslint, prettier, or biome rules and rank keep, tune, or drop via Wilson consensus across 5 lenses. |
 | `check-tests` | `/check-tests` | `[<file-or-module>]` | Check test coverage and missing test cases for changes on the current branch. |
 | `create-commit-message` | `/create-commit-message` | None | Produce a single ready-to-paste conventional commit message from current git changes. |
 | `create-unit-tests` | `/create-unit-tests` | `[<file-path \| directory \| module>]` | Write unit tests for branch changes or scoped target following best practices. |
+| `deslop` | `/deslop` | None | Remove AI-generated code slop (extra comments, defensive checks, `any` casts) from the branch diff. |
+| `deslop-prose` | `/deslop-prose` | `<file>` | Review a prose draft before delivery: strip AI slop, gloss jargon, convert parallel structure to tables. |
 | `fanout-review` | `/fanout-review` | None | Multi-perspective code review with breaking-change detection, deterministic merge gate, and questions for the dev. |
 | `fix-security-audit` | `/fix-security-audit` | `[<path-to-project>]` | Audit dependencies and fix vulnerabilities safely, least-invasive first, with automatic rollback backups. |
 | `framework-upgrade-guide` | `/framework-upgrade-guide` | `[<path-to-repo-or-package.json>]` | Stepwise major-by-major upgrade guide for TypeScript/Node projects (Angular, React, Vue). |
 | `generate-adr` | `/generate-adr` | `<decision title>` | Scaffold an Architecture Decision Record (Nygard format) in `docs/adr/` with auto-numbering and lifecycle tracking. |
-| `generate-spec` | `/generate-spec` | `<feature name>` | Scaffold a feature spec in `./specs/` using a reusable 9-section template. |
 | `learn` | `/learn` | `<concept>` | Learn and understand a concept in depth across multiple progressive depths. |
 | `optimize` | `/optimize` | `[branch \| backend \| frontend \| <path>]` | Analyze code for performance bottlenecks and recommend optimizations. Supports Vue SFCs. |
-| `plan-or-execute` | `/plan-or-execute` | `<task description>` | Decide whether to enter plan mode or execute directly for a given task. |
 | `pr-description` | `/pr-description` | `[<base-branch>]` | Generate pull request description from commits, diff, and inferred test steps. |
+| `resolve-merge-conflicts` | `/resolve-merge-conflicts` | None | Resolve conflicts from a halted merge, rebase, or cherry-pick by reconciling the intent of both sides. |
+| `security-check` | `/security-check` | `[<path>]` | Audit code against the OWASP Top 10 and report findings with severity, location, proof of concept, and fix. |
 | `ship-it` | `/ship-it` | `[<branch-name-or-card>]` | Branch (if needed), commit, and push current changes to remote in one step. |
-| `smart-fix` | `/smart-fix` | `<issue description>` | Intelligently classify, diagnose, and route bug, perf, security, or feature requests. |
 | `takeaways` | `/takeaways` | `<url \| text>` | Extract conclusions and key takeaways from video transcripts, articles, or posts with a direct final verdict. |
 | `update-claude-md` | `/update-claude-md` | `[<path-to-CLAUDE.md>]` | Update the project CLAUDE.md with conventions and patterns discovered in recent changes. |
 
@@ -64,6 +64,8 @@ The repository provides automated scripts to completely remove all installed ski
 
 - **macOS / Linux / WSL2**: Run `./uninstall.sh`
 - **Windows**: Run `uninstall.cmd`
+
+The uninstall scripts only remove skills currently in `skills/`. Skills dropped in later releases (`check-dx`, `generate-spec`, `plan-or-execute`, `smart-fix`) must be removed manually from `~/.claude/skills/` and `~/.agents/skills/`.
 
 ## License
 
