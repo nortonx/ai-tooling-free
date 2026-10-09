@@ -12,6 +12,8 @@ Curated, cross-platform AI coding **skills** and **agents** for Claude Code, Git
 
 ## Skills Catalog
 
+This table is checked against `skills/` in CI.
+
 | Skill | Command | Arguments | Description |
 |---|---|---|---|
 | `check-dry` | `/check-dry` | `[branch \| <path>]` | Detect DRY violations and recommend refactoring strategies. |
